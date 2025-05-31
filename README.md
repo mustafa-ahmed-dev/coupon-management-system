@@ -1,0 +1,1 @@
+- [ ] `git conifg core.autocrlf true`

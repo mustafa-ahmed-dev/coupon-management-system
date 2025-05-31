@@ -1,0 +1,15 @@
+import { Module } from '@nestjs/common';
+
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+
+import { AuditLogsModule } from '@audit-log/audit-logs.module';
+import { ConfigModule } from '@config/config.module';
+import { UserModule } from './user/user.module';
+
+@Module({
+  imports: [ConfigModule, AuditLogsModule, UserModule],
+  controllers: [AppController],
+  providers: [AppService],
+})
+export class AppModule {}
