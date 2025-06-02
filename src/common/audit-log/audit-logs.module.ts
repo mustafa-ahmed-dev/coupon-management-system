@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 
 import { AuditLogsService } from './audit-logs.service';
 
-import { ConfigModule } from '@config/config.module';
+import { ConfigModule } from 'src/common/config/config.module';
 
 @Module({
   imports: [ConfigModule],
