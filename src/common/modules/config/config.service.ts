@@ -83,19 +83,36 @@ export class ConfigService {
    */
   private loadJWTConfigData(): JWTConfigDto {
     return {
-      jwtAccessTokenSecret: this.configService.get<string>(
-        'JWT_ACCESS_TOKEN_SECRET',
+      jwtSecret: this.configService.get<string>('JWT_SECRET'),
+      jwtExpirationDuration: this.configService.get<string>(
+        'JWT_EXPIRATION_DURATION',
       ),
-      jwtAccessTokenExpirationTime: this.configService.get<string>(
-        'JWT_ACCESS_TOKEN_EXPIRATION_TIME',
-      )
-        ? parseInt(
-            this.configService.get<string>(
-              'JWT_ACCESS_TOKEN_EXPIRATION_TIME',
-            ) as string,
-            10,
-          )
-        : 15 * 60,
+      //   jwtAccessTokenSecret: this.configService.get<string>(
+      //     'JWT_ACCESS_TOKEN_SECRET',
+      //   ),
+      //   jwtAccessTokenExpirationTime: this.configService.get<string>(
+      //     'JWT_ACCESS_TOKEN_EXPIRATION_TIME',
+      //   )
+      //     ? parseInt(
+      //         this.configService.get<string>(
+      //           'JWT_ACCESS_TOKEN_EXPIRATION_TIME',
+      //         ) as string,
+      //         10,
+      //       )
+      //     : 15 * 60, // 15 minutes
+      //   jwtRefreshTokenSecret: this.configService.get<string>(
+      //     'JWT_REFRESH_TOKEN_SECRET',
+      //   ),
+      //   jwtRefreshTokenExpirationTime: this.configService.get<string>(
+      //     'JWT_REFRESH_TOKEN_EXPIRATION_TIME',
+      //   )
+      //     ? parseInt(
+      //         this.configService.get<string>(
+      //           'JWT_REFRESH_TOKEN_EXPIRATION_TIME',
+      //         ) as string,
+      //         10,
+      //       )
+      //     : 60 * 60 * 24 * 7, // 7 days
     } as JWTConfigDto;
   }
 

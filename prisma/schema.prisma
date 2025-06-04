@@ -9,11 +9,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// FIXME: add updatedBy for all models
+
 enum Role {
   user // Regular user with limited access
   admin // Can manage users and view reports
   manager // Can manage coupons and requests
-  support // Can assist users
 
   @@map("role")
 }
@@ -35,6 +36,7 @@ model User {
   givenCoupons    CouponRequest[]
   auditLogs       AuditLog[]
   couponApprovals CouponRequestApproval[]
+  Coupon          Coupon[]
 
   @@index([role])
   @@index([name])
@@ -50,18 +52,22 @@ enum CouponType {
 model Coupon {
   id Int @id @default(autoincrement())
 
-  code  String  @unique @db.VarChar(15)
-  price Decimal @db.Money
+  code   String  @unique @db.VarChar(25)
+  amount Decimal @db.Money // either a percentage or fixed amount
 
-  isUsed Boolean    @map("is_used")
+  isUsed Boolean    @default(false) @map("is_used")
   type   CouponType @default(fixed)
+
+  createdById Int @map("created_by_id")
 
   createdDate  DateTime  @default(now()) @map("created_date") @db.Timestamp()
   assignedDate DateTime? @map("assigned_date") @db.Timestamp()
 
   couponRequest CouponRequest?
+  createdBy     User           @relation(fields: [createdById], references: [id])
 
-  @@index([price])
+  @@index([assignedDate])
+  @@index([amount])
   @@index([isUsed])
   @@map("coupons")
 }
@@ -85,13 +91,12 @@ model CouponRequest {
   description  String @db.VarChar(512)
   userId       Int    @map("user_id")
   couponId     Int    @unique @map("coupon_id")
-  categoryId   Int?   @map("category_id")
+  categoryId   Int    @map("category_id")
 
-  user User @relation(fields: [userId], references: [id])
-
+  user     User                    @relation(fields: [userId], references: [id])
   coupon   Coupon                  @relation(fields: [couponId], references: [id])
   approval CouponRequestApproval[]
-  category CouponRequestCategory?  @relation(fields: [categoryId], references: [id])
+  category CouponRequestCategory   @relation(fields: [categoryId], references: [id])
 
   @@index([userId])
   @@map("issues")
@@ -112,7 +117,7 @@ model CouponRequestApproval {
   userId       Int                  @map("user_id")
   status       CouponApprovalStatus @default(pending)
   decisionDate DateTime             @default(now()) @map("decision_date") @db.Timestamp()
-  comment      String?              @map("comment") @db.VarChar(512)
+  comment      String               @map("comment") @db.VarChar(512)
 
   request CouponRequest @relation(fields: [requestId], references: [id])
   user    User          @relation(fields: [userId], references: [id])

@@ -1,8 +1,8 @@
 import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
-import { ValidationPipe } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 import helmet from 'helmet';
-// import ClassTransformer from '@nestjs/class-transformer';
+import { ConfigService } from '@common/modules/config/config.service';
 
 import { PrismaExceptionFilter } from '@prisma/prisma-exception.filter';
 
@@ -35,6 +35,11 @@ async function bootstrap() {
   app.useGlobalFilters(new PrismaExceptionFilter());
   app.use(helmet());
 
-  await app.listen(process.env.PORT ?? 3000);
+  const configService = app.get(ConfigService);
+  const port = configService.appConfig.port || 3001;
+
+  Logger.log(`Application is running on: http://localhost:${port}`);
+
+  await app.listen(port);
 }
 bootstrap();

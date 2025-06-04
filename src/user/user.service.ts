@@ -1,17 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
-import {
-  UpdateUserDto,
-  UpdateUserEmailDto,
-  UpdateUserPasswordDto,
-  UpdateUserRoleDto,
-  UpdateUserUsernameDto,
-} from './dto/update-user.dto';
+import { UpdateUserDto, UpdateUserPasswordDto } from './dto/update-user.dto';
 import { PrismaService } from '@prisma/prisma.service';
+import { HashService } from '@common/modules/hash/hash.service';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly hashService: HashService,
+  ) {}
 
   /**
    * @description Creates a new user in the database.
@@ -72,10 +70,6 @@ export class UserService {
   findOne(id: number) {
     return this.prisma.user.findUniqueOrThrow({
       where: { id },
-      omit: {
-        password: true,
-        refreshToken: true,
-      },
     });
   }
 
@@ -90,10 +84,6 @@ export class UserService {
   findByEmail(email: string) {
     return this.prisma.user.findUniqueOrThrow({
       where: { email },
-      omit: {
-        password: true,
-        refreshToken: true,
-      },
     });
   }
 
@@ -135,26 +125,6 @@ export class UserService {
   }
 
   /**
-   * @description Updates a user's role in the database.
-   * This method uses the Prisma service to update the role of a user with the specified ID.
-   * It omits sensitive fields such as password and refreshToken from the returned user object.
-   * @param {number} id - The unique identifier of the user whose role is to be updated.
-   * @param {UpdateUserRoleDto} dto - The data transfer object containing the new role for the user.
-   * @returns A promise that resolves to the updated user object without the password and refreshToken fields.
-   * @throws Will throw an error if the update fails, such as due to validation errors or database issues.
-   */
-  updateRole(id: number, { role }: UpdateUserRoleDto) {
-    return this.prisma.user.update({
-      where: { id },
-      data: { role },
-      omit: {
-        password: true,
-        refreshToken: true,
-      },
-    });
-  }
-
-  /**
    * @description Updates a user's password in the database.
    * This method uses the Prisma service to update the password of a user with the specified ID.
    * It omits sensitive fields such as refreshToken from the returned user object.
@@ -168,46 +138,6 @@ export class UserService {
       where: { id },
       data: { password },
       omit: {
-        refreshToken: true,
-      },
-    });
-  }
-
-  /**
-   * @description Updates a user's email in the database.
-   * This method uses the Prisma service to update the email of a user with the specified ID.
-   * It omits sensitive fields such as password and refreshToken from the returned user object.
-   * @param {number} id - The unique identifier of the user whose email is to be updated.
-   * @param {UpdateUserEmailDto} dto - The data transfer object containing the new email for the user.
-   * @returns A promise that resolves to the updated user object without the password and refreshToken fields.
-   * @throws Will throw an error if the update fails, such as due to validation errors or database issues.
-   */
-  updateEmail(id: number, { email }: UpdateUserEmailDto) {
-    return this.prisma.user.update({
-      where: { id },
-      data: { email },
-      omit: {
-        password: true,
-        refreshToken: true,
-      },
-    });
-  }
-
-  /**
-   * @description Updates a user's username in the database.
-   * This method uses the Prisma service to update the username of a user with the specified ID.
-   * It omits sensitive fields such as password and refreshToken from the returned user object.
-   * @param {number} id - The unique identifier of the user whose username is to be updated.
-   * @param {UpdateUserUsernameDto} dto - The data transfer object containing the new username for the user.
-   * @returns A promise that resolves to the updated user object without the password and refreshToken fields.
-   * @throws Will throw an error if the update fails, such as due to validation errors or database issues.
-   */
-  updateUsername(id: number, { username }: UpdateUserUsernameDto) {
-    return this.prisma.user.update({
-      where: { id },
-      data: { username },
-      omit: {
-        password: true,
         refreshToken: true,
       },
     });

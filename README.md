@@ -1,1 +1,1 @@
-- [ ] `git conifg core.autocrlf true`
+- [ ] - FIXME: add pagination

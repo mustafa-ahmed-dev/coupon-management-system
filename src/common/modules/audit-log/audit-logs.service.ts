@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
-import { ConfigService } from 'src/common/config/config.service';
+import { ConfigService } from '@common/modules/config/config.service';
 
 @Injectable()
 export class AuditLogsService {

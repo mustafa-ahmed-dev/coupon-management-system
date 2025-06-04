@@ -1,15 +1,11 @@
 import { PartialType, OmitType } from '@nestjs/mapped-types';
 
 import { CreateUserDto } from './create-user.dto';
+import { IsNotEmpty, IsString, MaxLength, MinLength } from 'class-validator';
+import { MatchProperty } from '@decorators/match-property.decorator';
 
 export class UpdateUserDto extends PartialType(
-  OmitType(CreateUserDto, [
-    'email',
-    'isActive',
-    'password',
-    'role',
-    'username',
-  ] as const),
+  OmitType(CreateUserDto, ['isActive', 'password'] as const),
 ) {}
 
 export class UpdateUserPasswordDto extends OmitType(CreateUserDto, [
@@ -18,28 +14,13 @@ export class UpdateUserPasswordDto extends OmitType(CreateUserDto, [
   'isActive',
   'role',
   'username',
-] as const) {}
-
-export class UpdateUserEmailDto extends OmitType(CreateUserDto, [
-  'name',
-  'password',
-  'isActive',
-  'role',
-  'username',
-] as const) {}
-
-export class UpdateUserUsernameDto extends OmitType(CreateUserDto, [
-  'name',
-  'email',
-  'password',
-  'isActive',
-  'role',
-] as const) {}
-
-export class UpdateUserRoleDto extends OmitType(CreateUserDto, [
-  'name',
-  'email',
-  'password',
-  'isActive',
-  'username',
-] as const) {}
+] as const) {
+  @IsNotEmpty()
+  @IsString()
+  @MinLength(8)
+  @MaxLength(25)
+  @MatchProperty('password', {
+    message: 'Passwords do not match',
+  })
+  passwordConfirm: string;
+}
