@@ -6,9 +6,10 @@ import {
   Patch,
   Param,
   Delete,
-  ParseIntPipe,
   UseGuards,
   Request,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import { CouponService } from './coupon.service';
 import { CreateCouponDto } from './dto/create-coupon.dto';
@@ -60,17 +61,27 @@ export class CouponController {
     return this.couponService.findOne(idOrCode);
   }
 
-  @Patch(':id')
+  @Patch(':identifier')
   @UseGuards(RolesGuard)
   @Roles(Role.admin, Role.manager)
-  update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateCouponDto) {
-    return this.couponService.update(id, dto);
+  update(
+    @Param('identifier') identifier: number | string,
+    @Body() dto: UpdateCouponDto,
+  ) {
+    const parsed = Number(identifier);
+    const idOrCode = isNaN(parsed) ? `${identifier}` : parsed;
+
+    return this.couponService.update(idOrCode, dto);
   }
 
-  @Delete(':id')
+  @Delete(':identifier')
   @UseGuards(RolesGuard)
   @Roles(Role.admin)
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.couponService.remove(id);
+  @HttpCode(HttpStatus.NO_CONTENT)
+  remove(@Param('identifier') identifier: number | string) {
+    const parsed = Number(identifier);
+    const idOrCode = isNaN(parsed) ? `${identifier}` : parsed;
+
+    return this.couponService.remove(idOrCode);
   }
 }

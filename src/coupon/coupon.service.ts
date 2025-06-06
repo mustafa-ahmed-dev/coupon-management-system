@@ -73,18 +73,29 @@ export class CouponService {
     });
   }
 
-  update(id: number, dto: UpdateCouponDto) {
+  update(identifier: number | string, dto: UpdateCouponDto) {
+    if (typeof identifier === 'string') {
+      return this.prismaService.coupon.update({
+        where: { code: identifier },
+        data: dto,
+      });
+    }
+
     return this.prismaService.coupon.update({
-      where: { id },
-      data: {
-        ...dto,
-      },
+      where: { id: identifier },
+      data: dto,
     });
   }
 
-  remove(id: number) {
+  remove(identifier: number | string) {
+    if (typeof identifier === 'string') {
+      return this.prismaService.coupon.delete({
+        where: { code: identifier },
+      });
+    }
+
     return this.prismaService.coupon.delete({
-      where: { id },
+      where: { id: identifier },
     });
   }
 }

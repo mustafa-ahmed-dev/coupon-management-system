@@ -9,6 +9,8 @@ import {
   ParseIntPipe,
   Put,
   UseGuards,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -231,6 +233,7 @@ export class UserController {
    * @param id - The ID of the user to delete
    */
   @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.userService.remove(id);
   }

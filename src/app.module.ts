@@ -12,6 +12,9 @@ import { AuthModule } from './auth/auth.module';
 import { PassportModule } from '@nestjs/passport';
 import { JwtConfigModule } from './common/modules/jwt/jwt.module';
 import { CouponModule } from './coupon/coupon.module';
+import { CouponRequestCategoryModule } from './coupon-request-category/coupon-request-category.module';
+import { CouponRequestModule } from './coupon-request/coupon-request.module';
+import { CouponRequestApprovalModule } from './coupon-request-approval/coupon-request-approval.module';
 
 @Module({
   imports: [
@@ -24,6 +27,9 @@ import { CouponModule } from './coupon/coupon.module';
     HashModule,
     AuthModule,
     CouponModule,
+    CouponRequestCategoryModule,
+    CouponRequestModule,
+    CouponRequestApprovalModule,
   ],
   controllers: [AppController],
   providers: [AppService, HashService],

@@ -86,15 +86,15 @@ model CouponRequestCategory {
 model CouponRequest {
   id Int @id @default(autoincrement())
 
-  orderNumber  BigInt @map("order_number")
+  orderNumber  Int    @map("order_number")
   customerName String @map("customer_name") @db.VarChar(50)
   description  String @db.VarChar(512)
   userId       Int    @map("user_id")
-  couponId     Int    @unique @map("coupon_id")
+  couponId     Int?   @unique @map("coupon_id")
   categoryId   Int    @map("category_id")
 
   user     User                    @relation(fields: [userId], references: [id])
-  coupon   Coupon                  @relation(fields: [couponId], references: [id])
+  coupon   Coupon?                 @relation(fields: [couponId], references: [id])
   approval CouponRequestApproval[]
   category CouponRequestCategory   @relation(fields: [categoryId], references: [id])
 

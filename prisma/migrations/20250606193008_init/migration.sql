@@ -1,5 +1,5 @@
 -- CreateEnum
-CREATE TYPE "role" AS ENUM ('user', 'admin', 'manager', 'support');
+CREATE TYPE "role" AS ENUM ('user', 'admin', 'manager');
 
 -- CreateEnum
 CREATE TYPE "CouponType" AS ENUM ('percentage', 'fixed');
@@ -26,10 +26,11 @@ CREATE TABLE "users" (
 -- CreateTable
 CREATE TABLE "coupons" (
     "id" SERIAL NOT NULL,
-    "code" VARCHAR(15) NOT NULL,
-    "price" MONEY NOT NULL,
-    "is_used" BOOLEAN NOT NULL,
+    "code" VARCHAR(25) NOT NULL,
+    "amount" MONEY NOT NULL,
+    "is_used" BOOLEAN NOT NULL DEFAULT false,
     "type" "CouponType" NOT NULL DEFAULT 'fixed',
+    "created_by_id" INTEGER NOT NULL,
     "created_date" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "assigned_date" TIMESTAMP,
 
@@ -48,12 +49,12 @@ CREATE TABLE "coupon_request_categories" (
 -- CreateTable
 CREATE TABLE "issues" (
     "id" SERIAL NOT NULL,
-    "order_number" BIGINT NOT NULL,
+    "order_number" INTEGER NOT NULL,
     "customer_name" VARCHAR(50) NOT NULL,
     "description" VARCHAR(512) NOT NULL,
     "user_id" INTEGER NOT NULL,
-    "coupon_id" INTEGER NOT NULL,
-    "category_id" INTEGER,
+    "coupon_id" INTEGER,
+    "category_id" INTEGER NOT NULL,
 
     CONSTRAINT "issues_pkey" PRIMARY KEY ("id")
 );
@@ -65,7 +66,7 @@ CREATE TABLE "coupon_request_approvals" (
     "user_id" INTEGER NOT NULL,
     "status" "coupon_approval_status" NOT NULL DEFAULT 'pending',
     "decision_date" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "comment" VARCHAR(512),
+    "comment" VARCHAR(512) NOT NULL,
 
     CONSTRAINT "coupon_request_approvals_pkey" PRIMARY KEY ("id")
 );
@@ -107,7 +108,10 @@ CREATE INDEX "users_is_active_idx" ON "users"("is_active");
 CREATE UNIQUE INDEX "coupons_code_key" ON "coupons"("code");
 
 -- CreateIndex
-CREATE INDEX "coupons_price_idx" ON "coupons"("price");
+CREATE INDEX "coupons_assigned_date_idx" ON "coupons"("assigned_date");
+
+-- CreateIndex
+CREATE INDEX "coupons_amount_idx" ON "coupons"("amount");
 
 -- CreateIndex
 CREATE INDEX "coupons_is_used_idx" ON "coupons"("is_used");
@@ -128,13 +132,16 @@ CREATE INDEX "coupon_request_approvals_request_id_idx" ON "coupon_request_approv
 CREATE INDEX "coupon_request_approvals_user_id_idx" ON "coupon_request_approvals"("user_id");
 
 -- AddForeignKey
+ALTER TABLE "coupons" ADD CONSTRAINT "coupons_created_by_id_fkey" FOREIGN KEY ("created_by_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "issues" ADD CONSTRAINT "issues_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "issues" ADD CONSTRAINT "issues_coupon_id_fkey" FOREIGN KEY ("coupon_id") REFERENCES "coupons"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "issues" ADD CONSTRAINT "issues_coupon_id_fkey" FOREIGN KEY ("coupon_id") REFERENCES "coupons"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "issues" ADD CONSTRAINT "issues_category_id_fkey" FOREIGN KEY ("category_id") REFERENCES "coupon_request_categories"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "issues" ADD CONSTRAINT "issues_category_id_fkey" FOREIGN KEY ("category_id") REFERENCES "coupon_request_categories"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "coupon_request_approvals" ADD CONSTRAINT "coupon_request_approvals_request_id_fkey" FOREIGN KEY ("request_id") REFERENCES "issues"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
