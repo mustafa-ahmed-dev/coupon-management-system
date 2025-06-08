@@ -4,6 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import { HashService } from '@common/modules/hash/hash.service';
 import { UserService } from '@user/user.service'; // Adjust the import path as necessary
 import { JwtTokenPayload } from './entities/jwt-token-payload.entity';
+import { PrismaService } from '@prisma/prisma.service';
 
 @Injectable()
 export class AuthService {
@@ -11,6 +12,7 @@ export class AuthService {
     private readonly usersService: UserService,
     private readonly jwtService: JwtService,
     private readonly hashService: HashService,
+    private readonly prisma: PrismaService,
   ) {}
 
   async login(email: string, password: string) {
@@ -34,6 +36,15 @@ export class AuthService {
       role: user.role,
     } as JwtTokenPayload;
     const accessToken = await this.jwtService.signAsync(payload);
+
+    await this.prisma.user.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        lastLogin: new Date(Date.now()),
+      },
+    });
 
     return {
       accessToken,

@@ -5,7 +5,7 @@ CREATE TYPE "role" AS ENUM ('user', 'admin', 'manager');
 CREATE TYPE "CouponType" AS ENUM ('percentage', 'fixed');
 
 -- CreateEnum
-CREATE TYPE "coupon_approval_status" AS ENUM ('pending', 'approved', 'rejected');
+CREATE TYPE "coupon_approval_status" AS ENUM ('pending', 'approved', 'rejected', 'cancelled', 'expired');
 
 -- CreateTable
 CREATE TABLE "users" (
@@ -63,10 +63,11 @@ CREATE TABLE "issues" (
 CREATE TABLE "coupon_request_approvals" (
     "id" SERIAL NOT NULL,
     "request_id" INTEGER NOT NULL,
-    "user_id" INTEGER NOT NULL,
+    "user_id" INTEGER,
     "status" "coupon_approval_status" NOT NULL DEFAULT 'pending',
     "decision_date" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "comment" VARCHAR(512) NOT NULL,
+    "comment" VARCHAR(512),
+    "cancel_reason" VARCHAR(256),
 
     CONSTRAINT "coupon_request_approvals_pkey" PRIMARY KEY ("id")
 );
@@ -126,6 +127,9 @@ CREATE UNIQUE INDEX "issues_coupon_id_key" ON "issues"("coupon_id");
 CREATE INDEX "issues_user_id_idx" ON "issues"("user_id");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "coupon_request_approvals_request_id_key" ON "coupon_request_approvals"("request_id");
+
+-- CreateIndex
 CREATE INDEX "coupon_request_approvals_request_id_idx" ON "coupon_request_approvals"("request_id");
 
 -- CreateIndex
@@ -147,7 +151,7 @@ ALTER TABLE "issues" ADD CONSTRAINT "issues_category_id_fkey" FOREIGN KEY ("cate
 ALTER TABLE "coupon_request_approvals" ADD CONSTRAINT "coupon_request_approvals_request_id_fkey" FOREIGN KEY ("request_id") REFERENCES "issues"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "coupon_request_approvals" ADD CONSTRAINT "coupon_request_approvals_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "coupon_request_approvals" ADD CONSTRAINT "coupon_request_approvals_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "audit_logs" ADD CONSTRAINT "audit_logs_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

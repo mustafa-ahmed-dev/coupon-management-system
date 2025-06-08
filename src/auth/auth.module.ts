@@ -6,6 +6,7 @@ import { JwtConfigModule } from '@jwt/jwt.module';
 import { HashModule } from '@hash/hash.module';
 import { JwtStrategy } from './startegies/jwt.startegy';
 import { ConfigModule } from '@config/config.module';
+import { PrismaModule } from '@prisma/prisma.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { ConfigModule } from '@config/config.module';
     forwardRef(() => UserModule),
     JwtConfigModule,
     HashModule,
+    PrismaModule,
   ],
   providers: [AuthService, JwtStrategy],
   controllers: [AuthController],

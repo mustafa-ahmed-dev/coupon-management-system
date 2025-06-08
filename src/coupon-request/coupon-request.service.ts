@@ -24,17 +24,87 @@ export class CouponRequestService {
             id: userId,
           },
         },
+        approval: {
+          create: {},
+        },
+      },
+      include: {
+        approval: {
+          select: {
+            id: true,
+            comment: true,
+            decisionDate: true,
+            status: true,
+            user: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
+        },
+        category: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
       },
     });
   }
 
   findAll() {
-    return this.prisma.couponRequest.findMany();
+    return this.prisma.couponRequest.findMany({
+      include: {
+        approval: {
+          select: {
+            id: true,
+            comment: true,
+            decisionDate: true,
+            status: true,
+            user: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
+        },
+        category: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+    });
   }
 
   findOne(id: number) {
     return this.prisma.couponRequest.findUnique({
       where: { id },
+      include: {
+        approval: {
+          select: {
+            id: true,
+            comment: true,
+            decisionDate: true,
+            status: true,
+            user: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
+        },
+        category: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
     });
   }
 

@@ -12,9 +12,9 @@ datasource db {
 // FIXME: add updatedBy for all models
 
 enum Role {
-  user // Regular user with limited access
-  admin // Can manage users and view reports
-  manager // Can manage coupons and requests
+  user    @map("user") // Regular user with limited access
+  admin   @map("admin") // Can manage users and view reports
+  manager @map("manager") // Can manage coupons and requests
 
   @@map("role")
 }
@@ -45,8 +45,8 @@ model User {
 }
 
 enum CouponType {
-  percentage
-  fixed
+  percentage @map("percentage")
+  fixed      @map("fixed")
 }
 
 model Coupon {
@@ -93,19 +93,21 @@ model CouponRequest {
   couponId     Int?   @unique @map("coupon_id")
   categoryId   Int    @map("category_id")
 
-  user     User                    @relation(fields: [userId], references: [id])
-  coupon   Coupon?                 @relation(fields: [couponId], references: [id])
-  approval CouponRequestApproval[]
-  category CouponRequestCategory   @relation(fields: [categoryId], references: [id])
+  user     User                   @relation(fields: [userId], references: [id])
+  coupon   Coupon?                @relation(fields: [couponId], references: [id])
+  approval CouponRequestApproval?
+  category CouponRequestCategory  @relation(fields: [categoryId], references: [id])
 
   @@index([userId])
   @@map("issues")
 }
 
 enum CouponApprovalStatus {
-  pending
-  approved
-  rejected
+  pending   @map("pending")
+  approved  @map("approved")
+  rejected  @map("rejected")
+  cancelled @map("cancelled")
+  expired   @map("expired")
 
   @@map("coupon_approval_status")
 }
@@ -113,14 +115,15 @@ enum CouponApprovalStatus {
 model CouponRequestApproval {
   id Int @id @default(autoincrement())
 
-  requestId    Int                  @map("request_id")
-  userId       Int                  @map("user_id")
+  requestId    Int                  @unique @map("request_id")
+  userId       Int?                 @map("user_id")
   status       CouponApprovalStatus @default(pending)
   decisionDate DateTime             @default(now()) @map("decision_date") @db.Timestamp()
-  comment      String               @map("comment") @db.VarChar(512)
+  comment      String?              @db.VarChar(512)
+  cancelReason String?              @map("cancel_reason") @db.VarChar(256)
 
   request CouponRequest @relation(fields: [requestId], references: [id])
-  user    User          @relation(fields: [userId], references: [id])
+  user    User?         @relation(fields: [userId], references: [id])
 
   @@index([requestId])
   @@index([userId])
