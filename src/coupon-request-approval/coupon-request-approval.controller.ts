@@ -23,58 +23,84 @@ import { RolesGuard } from '@common/guards/role.guard';
 import { Roles } from '@decorators/roles.decorator';
 import { Role } from '@generated-prisma/client';
 import { CancelCouponRequestApprovalDto } from './dto/cancel-coupon-request-approval.dto';
+import superjson, { SuperJSONResult } from 'superjson';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(Role.admin, Role.manager)
-@Controller('coupon-request-approval')
+@Controller('coupon-request-approvals')
 export class CouponRequestApprovalController {
   constructor(
     private readonly couponRequestApprovalService: CouponRequestApprovalService,
   ) {}
 
   @Get()
-  findAll() {
-    return this.couponRequestApprovalService.findAll();
+  async findAll(): Promise<SuperJSONResult['json']> {
+    const data = await this.couponRequestApprovalService.findAll();
+
+    return this.serialize(data);
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.couponRequestApprovalService.findOne(id);
+  async findOne(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<SuperJSONResult['json']> {
+    const data = await this.couponRequestApprovalService.findOne(id);
+
+    return this.serialize(data);
   }
 
   @Patch(':id')
-  update(
+  async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateCouponRequestApprovalDto,
-  ) {
-    return this.couponRequestApprovalService.update(id, dto);
+  ): Promise<SuperJSONResult['json']> {
+    const data = await this.couponRequestApprovalService.update(id, dto);
+
+    return this.serialize(data);
   }
 
   @Put(':id/status')
-  updateStatus(
+  async updateStatus(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateCouponRequestApprovalStatusDto,
     @Request()
     request: ExpressRequest & {
       user: JwtTokenPayload;
     },
-  ) {
+  ): Promise<SuperJSONResult['json']> {
     const userId = request.user.sub;
 
-    return this.couponRequestApprovalService.updateStatus(id, dto, userId);
+    const data = await this.couponRequestApprovalService.updateStatus(
+      id,
+      dto,
+      userId,
+    );
+
+    return this.serialize(data);
   }
 
   @Post(':id/cancel')
-  cancel(
+  async cancel(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: CancelCouponRequestApprovalDto,
-  ) {
-    return this.couponRequestApprovalService.cancel(id, dto);
+  ): Promise<SuperJSONResult['json']> {
+    const data = await this.couponRequestApprovalService.cancel(id, dto);
+
+    return this.serialize(data);
   }
 
   @Roles(Role.admin)
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.couponRequestApprovalService.remove(id);
+  async remove(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<SuperJSONResult['json']> {
+    const data = await this.couponRequestApprovalService.remove(id);
+
+    return this.serialize(data);
+  }
+
+  private serialize(data: any): SuperJSONResult['json'] {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+    return superjson.serialize(data).json;
   }
 }

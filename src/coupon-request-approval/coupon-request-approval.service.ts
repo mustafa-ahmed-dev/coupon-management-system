@@ -32,10 +32,20 @@ export class CouponRequestApprovalService {
     });
   }
 
-  findAll() {
-    return this.prisma.couponRequestApproval.groupBy({
-      by: ['status'],
+  async findAll() {
+    const approvals = await this.prisma.couponRequestApproval.findMany({
+      include: {
+        request: true,
+        user: true,
+      },
+      orderBy: {
+        status: 'asc',
+      },
     });
+
+    const grouped = Object.groupBy(approvals, (approval) => approval.status);
+
+    return grouped;
   }
 
   findOne(id: number) {

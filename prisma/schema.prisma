@@ -86,7 +86,7 @@ model CouponRequestCategory {
 model CouponRequest {
   id Int @id @default(autoincrement())
 
-  orderNumber  Int    @map("order_number")
+  orderNumber  BigInt @map("order_number")
   customerName String @map("customer_name") @db.VarChar(50)
   description  String @db.VarChar(512)
   userId       Int    @map("user_id")

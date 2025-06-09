@@ -19,6 +19,7 @@ import { JwtAuthGuard } from '@auth/guards/jwt-auth.guard';
 import { RolesGuard } from '@common/guards/role.guard';
 import { Roles } from '@decorators/roles.decorator';
 import { Role } from '@generated-prisma/client';
+import superjson, { SuperJSONResult } from 'superjson';
 
 @UseGuards(JwtAuthGuard)
 @Controller('coupon-requests')
@@ -26,42 +27,58 @@ export class CouponRequestController {
   constructor(private readonly couponRequestService: CouponRequestService) {}
 
   @Post()
-  create(
+  async create(
     @Body() dto: CreateCouponRequestDto,
-    @Request()
-    request: ExpressRequest & {
-      user: JwtTokenPayload;
-    }, // FIXME: create a custom request type
-  ) {
+    @Request() request: ExpressRequest & { user: JwtTokenPayload },
+  ): Promise<SuperJSONResult['json']> {
     const userId = request.user.sub;
 
-    return this.couponRequestService.create(dto, userId);
+    const couponRequest = await this.couponRequestService.create(dto, userId);
+
+    return this.serialize(couponRequest);
   }
 
   @Get()
-  findAll() {
-    return this.couponRequestService.findAll();
+  async findAll(): Promise<SuperJSONResult['json']> {
+    const data = await this.couponRequestService.findAll();
+
+    return this.serialize(data);
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.couponRequestService.findOne(id);
+  async findOne(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<SuperJSONResult['json']> {
+    const data = await this.couponRequestService.findOne(id);
+
+    return this.serialize(data);
   }
 
   @Patch(':id')
   @UseGuards(RolesGuard)
   @Roles(Role.admin, Role.manager)
-  update(
+  async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateCouponRequestDto,
-  ) {
-    return this.couponRequestService.update(id, dto);
+  ): Promise<SuperJSONResult['json']> {
+    const data = await this.couponRequestService.update(id, dto);
+
+    return this.serialize(data);
   }
 
   @UseGuards(RolesGuard)
   @Roles(Role.admin)
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.couponRequestService.remove(id);
+  async remove(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<SuperJSONResult['json']> {
+    const data = await this.couponRequestService.remove(id);
+
+    return this.serialize(data);
+  }
+
+  private serialize(data: any): SuperJSONResult['json'] {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+    return superjson.serialize(data).json;
   }
 }

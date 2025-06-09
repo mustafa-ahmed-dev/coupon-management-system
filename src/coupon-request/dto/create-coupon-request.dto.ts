@@ -4,7 +4,7 @@ export class CreateCouponRequestDto {
   @IsNotEmpty()
   @IsNumber()
   @IsInt()
-  orderNumber: number;
+  orderNumber: string;
 
   @IsNotEmpty()
   @IsString()
