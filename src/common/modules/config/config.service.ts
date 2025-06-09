@@ -44,16 +44,16 @@ export class ConfigService {
   private loadAppConfigData(): AppConfigDto {
     return {
       env: this.loadEnv(),
-      host: this.configService.get<string>('APP_HOST'),
-      name: this.configService.get<string>('APP_NAME'),
-      port: this.configService.get<string>('APP_PORT')
-        ? parseInt(this.configService.get<string>('APP_PORT') as string, 10)
-        : 3001,
-      protocol: this.configService.get<string>('PROTOCOL'),
+      host: this.configService.get<string>('APP_HOST')!,
+      name: this.configService.get<string>('APP_NAME')!,
+      port: parseInt(this.configService.get<string>('APP_PORT')!, 10),
+      protocol: this.configService.get<string>('PROTOCOL')!,
       uploadedFilesDestination: this.configService.get<string>(
         'UPLOADED_FILES_DESTINATION',
-      ),
-    } as AppConfigDto;
+      )!,
+      frontendUrl: this.configService.get<string>('FRONTEND_URL')!,
+      apiBaseUrl: this.configService.get<string>('API_BASE_URL')!,
+    };
   }
 
   /**
@@ -62,19 +62,14 @@ export class ConfigService {
    */
   private loadDatabaseConfigData(): DatabaseConfigDto {
     return {
-      databaseUrl: this.configService.get<string>('DATABASE_URL'),
-      name: this.configService.get<string>('POSTGRES_DB'),
-      user: this.configService.get<string>('POSTGRES_USER'),
-      host: this.configService.get<string>('POSTGRES_HOST'),
-      password: this.configService.get<string>('POSTGRES_PASSWORD'),
-      port: this.configService.get<string>('POSTGRES_POR')
-        ? parseInt(
-            this.configService.get<string>('POSTGRES_PORT') as string,
-            10,
-          )
-        : 5432,
-      schema: this.configService.get<string>('POSTGRES_SCHEMA'),
-    } as DatabaseConfigDto;
+      databaseUrl: this.configService.get<string>('DATABASE_URL')!,
+      name: this.configService.get<string>('POSTGRES_DB')!,
+      user: this.configService.get<string>('POSTGRES_USER')!,
+      host: this.configService.get<string>('POSTGRES_HOST')!,
+      password: this.configService.get<string>('POSTGRES_PASSWORD')!,
+      port: parseInt(this.configService.get<string>('POSTGRES_PORT')!, 10),
+      schema: this.configService.get<string>('POSTGRES_SCHEMA')!,
+    };
   }
 
   /**
@@ -83,10 +78,10 @@ export class ConfigService {
    */
   private loadJWTConfigData(): JWTConfigDto {
     return {
-      jwtSecret: this.configService.get<string>('JWT_SECRET'),
+      jwtSecret: this.configService.get<string>('JWT_SECRET')!,
       jwtExpirationDuration: this.configService.get<string>(
         'JWT_EXPIRATION_DURATION',
-      ),
+      )!,
       //   jwtAccessTokenSecret: this.configService.get<string>(
       //     'JWT_ACCESS_TOKEN_SECRET',
       //   ),
@@ -113,7 +108,7 @@ export class ConfigService {
       //         10,
       //       )
       //     : 60 * 60 * 24 * 7, // 7 days
-    } as JWTConfigDto;
+    };
   }
 
   /**

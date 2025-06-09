@@ -15,6 +15,7 @@ import { CouponModule } from './coupon/coupon.module';
 import { CouponRequestCategoryModule } from './coupon-request-category/coupon-request-category.module';
 import { CouponRequestModule } from './coupon-request/coupon-request.module';
 import { CouponRequestApprovalModule } from './coupon-request-approval/coupon-request-approval.module';
+import { HealthModule } from './health/health.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { CouponRequestApprovalModule } from './coupon-request-approval/coupon-re
     CouponRequestCategoryModule,
     CouponRequestModule,
     CouponRequestApprovalModule,
+    HealthModule,
   ],
   controllers: [AppController],
   providers: [AppService, HashService],

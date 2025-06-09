@@ -4,6 +4,7 @@ import {
   IsNotEmpty,
   IsNumber,
   IsString,
+  // IsUrl,
   Max,
   Min,
 } from 'class-validator';
@@ -42,4 +43,14 @@ export class AppConfigDto {
   @IsNotEmpty()
   @IsString()
   uploadedFilesDestination: string;
+
+  @IsNotEmpty()
+  @IsString()
+  // @IsUrl() // FIXME
+  frontendUrl: string;
+
+  @IsNotEmpty()
+  @IsString()
+  // @IsUrl() // FIXME
+  apiBaseUrl: string;
 }
