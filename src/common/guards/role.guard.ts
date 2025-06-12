@@ -1,13 +1,14 @@
-import { Request } from 'express';
-import { Reflector } from '@nestjs/core';
 import {
   Injectable,
   CanActivate,
   ExecutionContext,
   ForbiddenException,
 } from '@nestjs/common';
-import { Role } from '@generated-prisma/client';
+import { Request } from 'express';
+import { Reflector } from '@nestjs/core';
+import { ALLOW_SELF_KEY } from '@decorators/allow-self.decorator';
 import { ROLES_KEY } from '@decorators/roles.decorator';
+import { Role } from '@generated-prisma/client'; // adjust path if needed
 import { JwtTokenPayload } from '@auth/entities/jwt-token-payload.entity';
 
 @Injectable()
@@ -20,25 +21,29 @@ export class RolesGuard implements CanActivate {
       context.getClass(),
     ]);
 
-    // If no specific role is required, allow access
-    if (!requiredRoles || !requiredRoles?.length) return true;
+    const allowSelf = this.reflector.getAllAndOverride<boolean>(
+      ALLOW_SELF_KEY,
+      [context.getHandler(), context.getClass()],
+    );
+
     const request = context
       .switchToHttp()
       .getRequest<Request & { user: JwtTokenPayload }>();
+    const user = request.user;
+    const userId = user.sub;
+    const paramId = parseInt(request.params?.id, 10);
 
-    if (!request?.user) {
-      throw new ForbiddenException('Access denied: user not authenticated');
+    if (!user) {
+      throw new ForbiddenException('Not authenticated');
     }
 
-    const user = request?.user;
-    const isMatchedRole = requiredRoles.some((role) => role === user.role);
+    const isAdmin = requiredRoles?.includes(user.role);
+    const isSelf = allowSelf && userId === paramId;
 
-    if (!user || !isMatchedRole) {
-      throw new ForbiddenException(
-        `Access denied: requires roles "${requiredRoles.join(', ')}"`,
-      );
+    if (isAdmin || isSelf) {
+      return true;
     }
 
-    return true;
+    throw new ForbiddenException('Access denied');
   }
 }

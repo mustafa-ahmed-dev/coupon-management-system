@@ -20,6 +20,7 @@ import { JwtAuthGuard } from '@auth/guards/jwt-auth.guard';
 import { RolesGuard } from '@common/guards/role.guard';
 import { Roles } from '@decorators/roles.decorator';
 import { Role } from '@generated-prisma/client';
+import { AllowSelf } from '@decorators/allow-self.decorator';
 
 @Controller('users')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -83,6 +84,7 @@ export class UserController {
     return this.userService.findAll();
   }
 
+  @AllowSelf()
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.userService.findOne(id);

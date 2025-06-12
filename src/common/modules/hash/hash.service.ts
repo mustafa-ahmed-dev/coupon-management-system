@@ -17,8 +17,7 @@ export class HashService {
     try {
       return await argon2.hash(raw);
     } catch (error) {
-      console.error('Hashing failed:', error);
-      throw new InternalServerErrorException('Hashing failed');
+      throw new InternalServerErrorException(error, 'Hashing failed');
     }
   }
 
@@ -34,8 +33,7 @@ export class HashService {
       return isMatch;
     } catch (error) {
       // This only runs if verify() throws unexpectedly
-      console.error('Argon2 verification error:', error);
-      throw new InternalServerErrorException('Authentication failed');
+      throw new InternalServerErrorException(error, 'Verification failed');
     }
   }
 }
