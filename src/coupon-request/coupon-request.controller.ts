@@ -13,13 +13,12 @@ import {
 import { CouponRequestService } from './coupon-request.service';
 import { CreateCouponRequestDto } from './dto/create-coupon-request.dto';
 import { UpdateCouponRequestDto } from './dto/update-coupon-request.dto';
-import { Request as ExpressRequest } from 'express';
-import { JwtTokenPayload } from '@auth/entities/jwt-token-payload.entity';
 import { JwtAuthGuard } from '@auth/guards/jwt-auth.guard';
 import { RolesGuard } from '@common/guards/role.guard';
 import { Roles } from '@decorators/roles.decorator';
 import { Role } from '@generated-prisma/client';
 import superjson, { SuperJSONResult } from 'superjson';
+import type { AuthenticatedRequest } from '@interfaces/authenticated-request';
 
 @UseGuards(JwtAuthGuard)
 @Controller('coupon-requests')
@@ -29,7 +28,7 @@ export class CouponRequestController {
   @Post()
   async create(
     @Body() dto: CreateCouponRequestDto,
-    @Request() request: ExpressRequest & { user: JwtTokenPayload },
+    @Request() request: AuthenticatedRequest,
   ): Promise<SuperJSONResult['json']> {
     const userId = request.user.sub;
 
